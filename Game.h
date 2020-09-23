@@ -2,6 +2,8 @@
 
 #include "DXCore.h"
 #include "Mesh.h"
+#include "GameEntity.h"
+#include "Camera.h"
 #include <DirectXMath.h>
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <vector>
@@ -47,5 +49,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBufferVS;
 
 	std::vector<std::shared_ptr<Mesh>> meshes;
+	std::vector<std::shared_ptr<GameEntity>> entities;
+	std::vector<std::shared_ptr<Material>> materials;
+	std::shared_ptr<Camera> camera;
 };
 

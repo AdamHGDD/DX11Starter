@@ -60,6 +60,18 @@ void Game::Init()
 	LoadShaders();
 	CreateBasicGeometry();
 
+	// Create the materials
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), pixelShader, vertexShader)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), pixelShader, vertexShader)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), pixelShader, vertexShader)));
+
+	// Create the game entities
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[0], materials[0])));
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[0], materials[1])));
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[1], materials[0])));
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[1], materials[2])));
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[1])));
+
 	// Get size as the next multiple of 16(don’t hardcode a numberhere!)
 	unsigned int size = sizeof(VertexShaderExternalData);
 	// Round up to the nearest 16
@@ -77,6 +89,9 @@ void Game::Init()
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// Add the camera
+	camera = std::shared_ptr<Camera> (new Camera(XMFLOAT3(0, 0, -10), XMFLOAT3(0, 0, 0), ((float)this->width / this->height), .5f, 1, 1000, 1, 1));
 }
 
 // --------------------------------------------------------
@@ -241,6 +256,12 @@ void Game::OnResize()
 {
 	// Handle base-level DX resize stuff
 	DXCore::OnResize();
+	// Check for camera
+	if (camera != nullptr)
+	{
+		// Update aspect ratio
+		camera->UpdateProjectionMatrix((float)this->width / this->height);
+	}
 }
 
 // --------------------------------------------------------
@@ -248,6 +269,18 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
+	// Update the tranformations of the entities
+	for (size_t i = 0; i < entities.size(); i++)
+	{
+		// Rotate the current entity
+		entities[i]->GetTransform()->Rotate(0, 0, deltaTime);
+		// Randomly translate on x and y (not z because of camera)
+		entities[i]->GetTransform()->WorldTranslate(deltaTime * (rand() % 3 - 1), deltaTime * (rand() % 3 - 1), 0);
+	}
+
+	// Update camera
+	camera->Update(deltaTime, this->hWnd);
+
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
@@ -271,15 +304,6 @@ void Game::Draw(float deltaTime, float totalTime)
 		1.0f,
 		0);
 
-
-	// Set the vertex and pixel shaders to use for the next Draw() command
-	//  - These don't technically need to be set every frame
-	//  - Once you start applying different shaders to different objects,
-	//    you'll need to swap the current shaders before each draw
-	context->VSSetShader(vertexShader.Get(), 0, 0);
-	context->PSSetShader(pixelShader.Get(), 0, 0);
-
-
 	// Ensure the pipeline knows how to interpret the data (numbers)
 	// from the vertex buffer.  
 	// - If all of your 3D models use the exact same vertex layout,
@@ -287,49 +311,12 @@ void Game::Draw(float deltaTime, float totalTime)
 	// - However, this isn't always the case (but might be for this course)
 	context->IASetInputLayout(inputLayout.Get());
 
-	// Constant Buffer defined data
-	VertexShaderExternalData vsData;
-	vsData.colorTint = XMFLOAT4(1.0f, 0.5f, 0.5f, 1.0f);
-	vsData.offset = XMFLOAT3(.25f, 0.0f, 0.0f);
-
-	// Create a buffer for the memoty
-	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
-	// Lock the GPU off
-	context->Map(constantBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
-	// Copy over data
-	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
-	// Unlock the GPU
-	context->Unmap(constantBufferVS.Get(), 0);
-
-	// Bind the Constant buffer
-	context->VSSetConstantBuffers(0, 1, constantBufferVS.GetAddressOf());
-
-
-	for (size_t i = 0; i < meshes.size(); i++)
+	
+	// Draw all game entities
+	for (size_t i = 0; i < entities.size(); i++)
 	{
-		// Set buffers in the input assembler
-		//  - Do this ONCE PER OBJECT you're drawing, since each object might
-		//    have different geometry.
-		//  - for this demo, this step *could* simply be done once during Init(),
-		//    but I'm doing it here because it's often done multiple times per frame
-		//    in a larger application/game
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		context->IASetVertexBuffers(0, 1, meshes[i]->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-		context->IASetIndexBuffer(meshes[i]->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-
-
-		// Finally do the actual drawing
-		//  - Do this ONCE PER OBJECT you intend to draw
-		//  - This will use all of the currently set DirectX "stuff" (shaders, buffers, etc)
-		//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
-		//     vertices in the currently set VERTEX BUFFER
-		context->DrawIndexed(
-			meshes[i]->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
-			0,     // Offset to the first index we want to use
-			0);    // Offset to add to each index when looking up vertices
+		entities[i]->Draw(context, constantBufferVS, camera);
 	}
-
 
 
 	// Present the back buffer to the user
