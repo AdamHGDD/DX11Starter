@@ -2,6 +2,8 @@
 #include <DirectXMath.h>
 #include <wrl/client.h> 
 #include "DXCore.h"
+#include "SimpleShader.h"
+#include <memory>
 
 using namespace DirectX;
 
@@ -9,14 +11,14 @@ class Material
 {
 private:
 	XMFLOAT4 colorTint;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
+	std::shared_ptr<SimplePixelShader> pixelShader;
+	std::shared_ptr<SimpleVertexShader> vertexShader;
 public:
 	// Constructor
-	Material(XMFLOAT4 colorTint, Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader, Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader);
+	Material(XMFLOAT4 colorTint, std::shared_ptr<SimplePixelShader> pixelShader, std::shared_ptr<SimpleVertexShader> vertexShader);
 	// Getters
 	XMFLOAT4 GetColorTint();
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> GetPixelShader();
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> GetVertexShader();
+	std::shared_ptr<SimplePixelShader> GetPixelShader();
+	std::shared_ptr<SimpleVertexShader> GetVertexShader();
 };
 

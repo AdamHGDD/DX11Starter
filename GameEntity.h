@@ -27,6 +27,6 @@ public:
 	Transform* GetTransform();
 
 	// Draw call
-	void Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Buffer> constantBufferVS, std::shared_ptr<Camera> camera);
+	void Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, std::shared_ptr<Camera> camera);
 };
 

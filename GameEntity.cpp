@@ -21,34 +21,24 @@ Transform* GameEntity::GetTransform()
 	return &transform;
 }
 
-void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Buffer> constantBufferVS, std::shared_ptr<Camera> camera)
+void GameEntity::Draw(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, std::shared_ptr<Camera> camera)
 {
 	// Set the vertex and pixel shaders to use for the next Draw() command
 	//  - These don't technically need to be set every frame
 	//  - Once you start applying different shaders to different objects,
 	//    you'll need to swap the current shaders before each draw
-	context->VSSetShader(material->GetVertexShader().Get(), 0, 0);
-	context->PSSetShader(material->GetPixelShader().Get(), 0, 0);
+	material->GetVertexShader()->SetShader();
+	material->GetPixelShader()->SetShader();
 
 	// Constant Buffer defined data
-	VertexShaderExternalData vsData;
-	vsData.colorTint = material->GetColorTint();
-	vsData.worldMatrix = transform.GetWorldMatrix();
-	// Get camera information and put it in the cbuffer
-	vsData.viewMatrix = camera->GetViewMatrix();
-	vsData.projMatrix = camera->GetProjMatrix();
+	std::shared_ptr<SimpleVertexShader> vs = material->GetVertexShader(); 
+	vs->SetFloat4("colorTint", material->GetColorTint());
+	vs->SetMatrix4x4("worldMatrix", transform.GetWorldMatrix());
+	// Camera data
+	vs->SetMatrix4x4("viewMatrix", camera->GetViewMatrix());
+	vs->SetMatrix4x4("projMatrix", camera->GetProjMatrix());
 
-	// Create a buffer for the memoty
-	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
-	// Lock the GPU off
-	context->Map(constantBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
-	// Copy over data
-	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
-	// Unlock the GPU
-	context->Unmap(constantBufferVS.Get(), 0);
-
-	// Bind the Constant buffer
-	context->VSSetConstantBuffers(0, 1, constantBufferVS.GetAddressOf());
+	vs->CopyAllBufferData();
 
 
 	// Set buffers in the input assembler
