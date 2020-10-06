@@ -53,8 +53,17 @@ private:
 	std::vector<std::shared_ptr<Material>> materials;
 	std::shared_ptr<Camera> camera;
 
+	// Textures
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture1SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture2SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture3SRV;
+
+	// Sampler state for textures
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
+
 	DirectionalLight dLight;
 	DirectionalLight dLight2;
 	DirectionalLight dLight3;
+	PointLight pLight;
 };
 

@@ -36,9 +36,11 @@ struct VertexToPixel
 	//  |   Name          Semantic
 	//  |    |                |
 	//  v    v                v
-	float4 position		: SV_POSITION;	// XYZW position (System Value Position)
+	float4 position		: SV_POSITION;	// XYZW position (Camera view of pixel)
 	float4 color		: COLOR;        // RGBA color
 	float3 normal		: NORMAL;
+	float3 worldPos		: POSITION;	// XYZ position (World view of pixel)
+	float2 uv		: UV;
 };
 
 // --------------------------------------------------------
@@ -66,6 +68,9 @@ VertexToPixel main( VertexShaderInput input )
 	matrix wvp = mul(projMatrix, mul(viewMatrix, worldMatrix));
 	output.position = mul(wvp, float4(input.position, 1.0f));
 
+	// World position of the point
+	output.worldPos = mul(worldMatrix, float4(input.position, 1.0f)).xyz;
+
 	// Pass the color through 
 	// - The values will be interpolated per-pixel by the rasterizer
 	// - We don't need to alter it here, but we do need to send it to the pixel shader
@@ -73,6 +78,9 @@ VertexToPixel main( VertexShaderInput input )
 
 	// Move the normal into world space (no translation)
 	output.normal = mul((float3x3)worldMatrix, input.normal);
+
+	// Keep uvs the same
+	output.uv = input.uv;
 
 	// Whatever we return will make its way through the pipeline to the
 	// next programmable stage we're using (the pixel shader for now)

@@ -11,13 +11,19 @@ class Material
 {
 private:
 	XMFLOAT4 colorTint;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureSRV;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
+	float specularExponent;
 	std::shared_ptr<SimplePixelShader> pixelShader;
 	std::shared_ptr<SimpleVertexShader> vertexShader;
 public:
 	// Constructor
-	Material(XMFLOAT4 colorTint, std::shared_ptr<SimplePixelShader> pixelShader, std::shared_ptr<SimpleVertexShader> vertexShader);
+	Material(XMFLOAT4 colorTint, float specularExponent, std::shared_ptr<SimplePixelShader> pixelShader, std::shared_ptr<SimpleVertexShader> vertexShader, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureSRV, Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState);
 	// Getters
 	XMFLOAT4 GetColorTint();
+	float GetSpecularExponent();
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetSRV();
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> GetSamplerState();
 	std::shared_ptr<SimplePixelShader> GetPixelShader();
 	std::shared_ptr<SimpleVertexShader> GetVertexShader();
 };
