@@ -75,9 +75,10 @@ float3 CalcLight(VertexToPixel input, float3 ambientColor, float3 diffuseColor, 
 	// Ambient
 	lightColor += ambientColor * surfaceColor;
 
-	// Specularity
+	// Specularity vectors
 	float3 V = normalize(cameraPos - input.worldPos);
 	float3 R = reflect(dir, input.normal);
+	// Specularity calculation
 	float spec = pow(saturate(dot(R, V)), specExponent);
 	lightColor += spec.xxx;
 
