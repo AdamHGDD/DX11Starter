@@ -75,9 +75,9 @@ void Game::Init()
 	device->CreateSamplerState(&samplerDesc, samplerState.GetAddressOf());
 
 	// Textures using a method from  "WICTextureLoader.h" which is in "directxtk_desktop_win10" from NUGET
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../Assets/Textures/mossyStone.png").c_str(), nullptr, texture1SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../Assets/Textures/woodPlanks.png").c_str(), nullptr, texture2SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../Assets/Textures/cliff.png").c_str(), nullptr, texture3SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/mossyStone.png").c_str(), nullptr, texture1SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/woodPlanks.png").c_str(), nullptr, texture2SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cliff.png").c_str(), nullptr, texture3SRV.GetAddressOf());
 
 	// Create the materials
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShader, vertexShader, texture1SRV, samplerState)));
@@ -153,12 +153,12 @@ void Game::LoadShaders()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../Assets/Models/sphere.obj").c_str(), device)));
-	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../Assets/Models/cone.obj").c_str(), device)));
-	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../Assets/Models/cube.obj").c_str(), device)));
-	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../Assets/Models/cylinder.obj").c_str(), device)));
-	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../Assets/Models/helix.obj").c_str(), device)));
-	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../Assets/Models/torus.obj").c_str(), device)));
+	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device)));
+	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../../Assets/Models/cone.obj").c_str(), device)));
+	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../../Assets/Models/cube.obj").c_str(), device)));
+	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../../Assets/Models/cylinder.obj").c_str(), device)));
+	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../../Assets/Models/helix.obj").c_str(), device)));
+	meshes.push_back(std::shared_ptr<Mesh>(new Mesh(GetFullPathTo("../../Assets/Models/torus.obj").c_str(), device)));
 
 }
 
