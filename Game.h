@@ -44,6 +44,8 @@ private:
 	// Shaders now done with simple shader
 	std::shared_ptr<SimplePixelShader> pixelShader;
 	std::shared_ptr<SimpleVertexShader> vertexShader;
+	std::shared_ptr<SimplePixelShader> pixelShaderNormals;
+	std::shared_ptr<SimpleVertexShader> vertexShaderNormals;
 
 	// CBuffer
 	//	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBufferVS;
@@ -57,13 +59,13 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture1SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture2SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture3SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture4SRV;
 
 	// Sampler state for textures
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
+	D3D11_SAMPLER_DESC samplerDesc;
 
 	DirectionalLight dLight;
-	DirectionalLight dLight2;
-	DirectionalLight dLight3;
 	PointLight pLight;
 };
 

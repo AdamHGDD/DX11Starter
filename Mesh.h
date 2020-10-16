@@ -22,6 +22,7 @@ public:
 	// Methods for getting information
 	Microsoft::WRL::ComPtr<ID3D11Buffer> GetVertexBuffer();
 	Microsoft::WRL::ComPtr<ID3D11Buffer> GetIndexBuffer();
+	void CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices);
 	int GetIndexCount();
 
 	// Constructors

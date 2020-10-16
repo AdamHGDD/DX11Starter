@@ -62,35 +62,38 @@ void Game::Init()
 	CreateBasicGeometry();
 
 	// Create sampler state description
-	D3D11_SAMPLER_DESC samplerDesc;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	samplerDesc.MaxAnisotropy = 16;
-	samplerDesc.MinLOD = 0;
+	samplerDesc.MinLOD = 1;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	// Create sampler state
 	device->CreateSamplerState(&samplerDesc, samplerState.GetAddressOf());
 
 	// Textures using a method from  "WICTextureLoader.h" which is in "directxtk_desktop_win10" from NUGET
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/mossyStone.png").c_str(), nullptr, texture1SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/woodPlanks.png").c_str(), nullptr, texture2SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cliff.png").c_str(), nullptr, texture3SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/rock.png").c_str(), nullptr, texture1SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion.png").c_str(), nullptr, texture2SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/rock_normals.png").c_str(), nullptr, texture3SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, texture4SRV.GetAddressOf());
 
 	// Create the materials
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShader, vertexShader, texture1SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShader, vertexShader, texture2SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShader, vertexShader, texture3SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture3SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShader, vertexShader, texture1SRV, nullptr, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture4SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture2SRV, texture3SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture2SRV, texture4SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShader, vertexShader, texture2SRV, nullptr, samplerState)));
 
 	// Create the game entities
 	for (int i = 0; i < meshes.size(); i++)
 	{
 		// Create object
-		entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[i], materials[i/2])));
+		entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[i], materials[i])));
 		// Move object away from others
-		entities[i]->GetTransform()->LocalTranslate(i * 2 - 5, 0, 0);
+		entities[i]->GetTransform()->LocalTranslate(i * 2.0f - 5.0f, 0, 0);
 	}
 
 	// Get size as the next multiple of 16(don’t hardcode a numberhere!)
@@ -116,17 +119,12 @@ void Game::Init()
 
 	// Set up the original directional light
 	dLight.ambientColor = XMFLOAT3(0.01f, 0.01f, 0.1f);
-	dLight.diffuseColor = XMFLOAT3(1.0f, 0.1f, 0.1f);
-	dLight.direction = XMFLOAT3(0, -1, 0);
-
-	// Set up the third directional light
-	dLight2.ambientColor = XMFLOAT3(0.01f, 0.03f, 0.01f);
-	dLight2.diffuseColor = XMFLOAT3(0.0f, 0.2f, 1);
-	dLight2.direction = XMFLOAT3(0, 1, 0);
+	dLight.diffuseColor = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	dLight.direction = XMFLOAT3(0, -1, -.2f);
 
 	// Set up the point light
 	pLight.ambientColor = XMFLOAT3(0.01f, 0.03f, 0.01f);
-	pLight.diffuseColor = XMFLOAT3(0.0f, 1, 0);
+	pLight.diffuseColor = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	pLight.position = XMFLOAT3(0, 0, 0);
 }
 
@@ -142,8 +140,12 @@ void Game::LoadShaders()
 {
 	// Create the vertex shader through simple shader
 	vertexShader = std::shared_ptr<SimpleVertexShader> (new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShader.cso").c_str()));
+	// New vertex shader that has normals
+	vertexShaderNormals = std::shared_ptr<SimpleVertexShader> (new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShaderNormals.cso").c_str()));
 	// Create the pixel shader through simple shader
 	pixelShader = std::shared_ptr<SimplePixelShader> (new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShader.cso").c_str()));
+	// New pixel shader that has normals
+	pixelShaderNormals = std::shared_ptr<SimplePixelShader> (new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderNormals.cso").c_str()));
 }
 
 
@@ -217,20 +219,25 @@ void Game::Draw(float deltaTime, float totalTime)
 		1.0f,
 		0);
 
-	// Send in lights to the shader
-	pixelShader->SetData("dLight", &dLight, sizeof(DirectionalLight));
-	pixelShader->SetData("dLight2", &dLight2, sizeof(DirectionalLight));
-	pixelShader->SetData("pLight", &pLight, sizeof(PointLight));
-	pixelShader->SetFloat3("cameraPos", camera->transform.GetPosition());
-	pixelShader->CopyAllBufferData();
 	
 	// Draw all game entities
 	for (size_t i = 0; i < entities.size(); i++)
 	{
-		pixelShader->SetFloat("specExponent", entities[i]->material->GetSpecularExponent());
-		pixelShader->SetShaderResourceView("diffuseTexture", entities[i]->material->GetSRV().Get());
-		pixelShader->SetSamplerState("samplerOptions", samplerState.Get());
-		pixelShader->CopyAllBufferData();
+		// Send in lights to the shader
+		entities[i]->material->GetPixelShader()->SetData("dLight", &dLight, sizeof(DirectionalLight));
+		entities[i]->material->GetPixelShader()->SetData("pLight", &pLight, sizeof(PointLight));
+		entities[i]->material->GetPixelShader()->SetFloat3("cameraPos", camera->transform.GetPosition());
+		entities[i]->material->GetPixelShader()->SetFloat("specExponent", entities[i]->material->GetSpecularExponent());
+		// Send in textures
+		entities[i]->material->GetPixelShader()->SetShaderResourceView("diffuseTexture", entities[i]->material->GetDiffuseSRV().Get());
+		// Check for if it has a normal
+		if (entities[i]->material->GetNormalsSRV() != nullptr)
+		{
+			entities[i]->material->GetPixelShader()->SetShaderResourceView("normalsTexture", entities[i]->material->GetNormalsSRV().Get());
+		}
+		entities[i]->material->GetPixelShader()->SetSamplerState("samplerOptions", samplerState.Get());
+		// Send the data actually into the shader
+		entities[i]->material->GetPixelShader()->CopyAllBufferData();
 		entities[i]->Draw(context, camera);
 	}
 
