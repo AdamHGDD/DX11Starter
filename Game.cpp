@@ -2,6 +2,7 @@
 #include "Vertex.h"
 #include "BufferStructs.h"
 #include "WICTextureLoader.h"
+#include "DDSTextureLoader.h"
 
 // Needed for a helper function to read compiled shader files from the hard drive
 #pragma comment(lib, "d3dcompiler.lib")
@@ -79,6 +80,9 @@ void Game::Init()
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/rock_normals.png").c_str(), nullptr, texture3SRV.GetAddressOf());
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, texture4SRV.GetAddressOf());
 
+	// Sky texture
+	CreateDDSTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/SpaceCubeMap.dds").c_str(), nullptr, cubeTexSRV.GetAddressOf());
+
 	// Create the materials
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture3SRV, samplerState)));
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShader, vertexShader, texture1SRV, nullptr, samplerState)));
@@ -86,6 +90,9 @@ void Game::Init()
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture2SRV, texture3SRV, samplerState)));
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture2SRV, texture4SRV, samplerState)));
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShader, vertexShader, texture2SRV, nullptr, samplerState)));
+	
+	// Create the sky
+	sky = std::shared_ptr<Sky>(new Sky(meshes[2], samplerState, device, cubeTexSRV, pixelShaderSky, vertexShaderSky));
 
 	// Create the game entities
 	for (int i = 0; i < meshes.size(); i++)
@@ -139,13 +146,19 @@ void Game::Init()
 void Game::LoadShaders()
 {
 	// Create the vertex shader through simple shader
-	vertexShader = std::shared_ptr<SimpleVertexShader> (new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShader.cso").c_str()));
-	// New vertex shader that has normals
-	vertexShaderNormals = std::shared_ptr<SimpleVertexShader> (new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShaderNormals.cso").c_str()));
+	vertexShader = std::shared_ptr<SimpleVertexShader>(new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShader.cso").c_str()));
 	// Create the pixel shader through simple shader
-	pixelShader = std::shared_ptr<SimplePixelShader> (new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShader.cso").c_str()));
+	pixelShader = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShader.cso").c_str()));
+
+	// New vertex shader that has normals
+	vertexShaderNormals = std::shared_ptr<SimpleVertexShader>(new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShaderNormals.cso").c_str()));
 	// New pixel shader that has normals
-	pixelShaderNormals = std::shared_ptr<SimplePixelShader> (new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderNormals.cso").c_str()));
+	pixelShaderNormals = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderNormals.cso").c_str()));
+
+	// Skybox specific vertex shader
+	vertexShaderSky = std::shared_ptr<SimpleVertexShader>(new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShaderSky.cso").c_str()));
+	// Skybox specific pixel shader
+	pixelShaderSky = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderSky.cso").c_str()));
 }
 
 
@@ -240,6 +253,9 @@ void Game::Draw(float deltaTime, float totalTime)
 		entities[i]->material->GetPixelShader()->CopyAllBufferData();
 		entities[i]->Draw(context, camera);
 	}
+
+	// Draw the sky
+	sky->Draw(context, camera);
 
 
 	// Present the back buffer to the user

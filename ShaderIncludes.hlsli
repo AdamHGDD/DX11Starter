@@ -52,6 +52,14 @@ struct VertexToPixelNormals
 	float2 uv			: UV;
 };
 
+// New version for normals
+struct VertexToPixelSky
+{
+	// Data type	Name	Semantic
+	float4 position		: SV_POSITION;
+	float3 sampleDir		: DIRECTION;
+};
+
 // Struct for passing in directional light data
 struct DirectionalLight
 {

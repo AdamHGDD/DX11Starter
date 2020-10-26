@@ -5,6 +5,7 @@
 #include "GameEntity.h"
 #include "Lights.h"
 #include "Camera.h"
+#include "Sky.h"
 #include <DirectXMath.h>
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <vector>
@@ -46,6 +47,8 @@ private:
 	std::shared_ptr<SimpleVertexShader> vertexShader;
 	std::shared_ptr<SimplePixelShader> pixelShaderNormals;
 	std::shared_ptr<SimpleVertexShader> vertexShaderNormals;
+	std::shared_ptr<SimplePixelShader> pixelShaderSky;
+	std::shared_ptr<SimpleVertexShader> vertexShaderSky;
 
 	// CBuffer
 	//	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBufferVS;
@@ -60,6 +63,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture2SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture3SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture4SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cubeTexSRV;
 
 	// Sampler state for textures
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
@@ -67,5 +71,8 @@ private:
 
 	DirectionalLight dLight;
 	PointLight pLight;
+
+	// Skybox
+	std::shared_ptr<Sky> sky;
 };
 
