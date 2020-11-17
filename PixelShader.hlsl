@@ -14,7 +14,7 @@ SamplerState samplerOptions : register(s0);
 float4 main(VertexToPixel input) : SV_TARGET
 {
 	// Get surface color from the texture
-	float3 surfaceColor = diffuseTexture.Sample(samplerOptions, input.uv).rgb;
+	float3 surfaceColor = pow(diffuseTexture.Sample(samplerOptions, input.uv).rgb, 2.2);
 
 	// Set up variable for all necessary lightings
 	float3 finalColor = float3(0,0,0);
@@ -29,5 +29,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 	// - This color (like most values passing through the rasterizer) is 
 	//   interpolated for each pixel between the corresponding vertices 
 	//   of the triangle we're rendering
-	return float4(finalColor, 1);
+	return float4(pow(finalColor, 1.0f / 2.2f), 1);
 }

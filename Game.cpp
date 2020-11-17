@@ -81,7 +81,7 @@ void Game::Init()
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, texture4SRV.GetAddressOf());
 
 	// Sky texture
-	CreateDDSTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/SpaceCubeMap.dds").c_str(), nullptr, cubeTexSRV.GetAddressOf());
+	CreateDDSTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/SunnyCubeMap.dds").c_str(), nullptr, cubeTexSRV.GetAddressOf());
 
 	// Create the materials
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture3SRV, samplerState)));
