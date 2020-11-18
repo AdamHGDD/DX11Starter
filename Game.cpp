@@ -75,21 +75,21 @@ void Game::Init()
 	device->CreateSamplerState(&samplerDesc, samplerState.GetAddressOf());
 
 	// Textures using a method from  "WICTextureLoader.h" which is in "directxtk_desktop_win10" from NUGET
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/rock.png").c_str(), nullptr, texture1SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion.png").c_str(), nullptr, texture2SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/rock_normals.png").c_str(), nullptr, texture3SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, texture4SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_albedo.png").c_str(), nullptr, texture1SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_metal.png").c_str(), nullptr, texture2SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_normals.png").c_str(), nullptr, texture3SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_roughness.png").c_str(), nullptr, texture4SRV.GetAddressOf());
 
 	// Sky texture
 	CreateDDSTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/SunnyCubeMap.dds").c_str(), nullptr, cubeTexSRV.GetAddressOf());
 
 	// Create the materials
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture3SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShader, vertexShader, texture1SRV, nullptr, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture4SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture2SRV, texture3SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture2SRV, texture4SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShader, vertexShader, texture2SRV, nullptr, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShader, vertexShader, texture1SRV, texture2SRV, nullptr, texture4SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, nullptr, texture4SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShader, vertexShader, texture1SRV, texture2SRV, nullptr, texture4SRV, samplerState)));
 	
 	// Create the sky
 	sky = std::shared_ptr<Sky>(new Sky(meshes[2], samplerState, device, cubeTexSRV, pixelShaderSky, vertexShaderSky));
@@ -242,11 +242,13 @@ void Game::Draw(float deltaTime, float totalTime)
 		entities[i]->material->GetPixelShader()->SetFloat3("cameraPos", camera->transform.GetPosition());
 		entities[i]->material->GetPixelShader()->SetFloat("specExponent", entities[i]->material->GetSpecularExponent());
 		// Send in textures
-		entities[i]->material->GetPixelShader()->SetShaderResourceView("diffuseTexture", entities[i]->material->GetDiffuseSRV().Get());
+		entities[i]->material->GetPixelShader()->SetShaderResourceView("Albedo", entities[i]->material->GetDiffuseSRV().Get());
+		entities[i]->material->GetPixelShader()->SetShaderResourceView("MetalnessMap", entities[i]->material->GetMetalSRV().Get());
+		entities[i]->material->GetPixelShader()->SetShaderResourceView("RoughnessMap", entities[i]->material->GetRoughSRV().Get());
 		// Check for if it has a normal
 		if (entities[i]->material->GetNormalsSRV() != nullptr)
 		{
-			entities[i]->material->GetPixelShader()->SetShaderResourceView("normalsTexture", entities[i]->material->GetNormalsSRV().Get());
+			entities[i]->material->GetPixelShader()->SetShaderResourceView("NormalMap", entities[i]->material->GetNormalsSRV().Get());
 		}
 		entities[i]->material->GetPixelShader()->SetSamplerState("samplerOptions", samplerState.Get());
 		// Send the data actually into the shader
