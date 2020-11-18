@@ -75,10 +75,18 @@ void Game::Init()
 	device->CreateSamplerState(&samplerDesc, samplerState.GetAddressOf());
 
 	// Textures using a method from  "WICTextureLoader.h" which is in "directxtk_desktop_win10" from NUGET
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_albedo.png").c_str(), nullptr, texture1SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_metal.png").c_str(), nullptr, texture2SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_normals.png").c_str(), nullptr, texture3SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_roughness.png").c_str(), nullptr, texture4SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_albedo.png").c_str(), nullptr, texture1SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_metal.png").c_str(), nullptr, texture2SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_normals.png").c_str(), nullptr, texture3SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_roughness.png").c_str(), nullptr, texture4SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/floor_albedo.png").c_str(), nullptr, texture5SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/floor_metal.png").c_str(), nullptr, texture6SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/floor_normals.png").c_str(), nullptr, texture7SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/floor_roughness.png").c_str(), nullptr, texture8SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_albedo.png").c_str(), nullptr, texture9SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_metal.png").c_str(), nullptr, texture10SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_normals.png").c_str(), nullptr, texture11SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_roughness.png").c_str(), nullptr, texture12SRV.GetAddressOf());
 
 	// Sky texture
 	CreateDDSTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/SunnyCubeMap.dds").c_str(), nullptr, cubeTexSRV.GetAddressOf());
@@ -86,10 +94,10 @@ void Game::Init()
 	// Create the materials
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShader, vertexShader, texture1SRV, texture2SRV, nullptr, texture4SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, nullptr, texture4SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShader, vertexShader, texture1SRV, texture2SRV, nullptr, texture4SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture5SRV, texture6SRV, texture7SRV, texture8SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture5SRV, texture6SRV, nullptr, texture8SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture9SRV, texture10SRV, texture11SRV, texture12SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShader, vertexShader, texture9SRV, texture10SRV, nullptr, texture12SRV, samplerState)));
 	
 	// Create the sky
 	sky = std::shared_ptr<Sky>(new Sky(meshes[2], samplerState, device, cubeTexSRV, pixelShaderSky, vertexShaderSky));

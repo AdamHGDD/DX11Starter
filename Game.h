@@ -63,6 +63,14 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture2SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture3SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture4SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture5SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture6SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture7SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture8SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture9SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture10SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture11SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture12SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cubeTexSRV;
 
 	// Sampler state for textures
