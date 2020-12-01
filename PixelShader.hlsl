@@ -11,7 +11,10 @@ cbuffer ExternalData : register(b0)
 Texture2D Albedo : register(t0);
 Texture2D RoughnessMap : register(t1);
 Texture2D MetalnessMap : register(t2);
+Texture2D ShadowChart : register(t3);
+
 SamplerState samplerOptions : register(s0);
+SamplerState samplerState2 : register(s1);
 
 float4 main(VertexToPixel input) : SV_TARGET
 {

@@ -74,15 +74,26 @@ void Game::Init()
 	// Create sampler state
 	device->CreateSamplerState(&samplerDesc, samplerState.GetAddressOf());
 
+	// Create sampler state description 2
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.MaxAnisotropy = 16;
+	samplerDesc.MinLOD = 1;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	device->CreateSamplerState(&samplerDesc, samplerState2.GetAddressOf());
+
 	// Textures using a method from  "WICTextureLoader.h" which is in "directxtk_desktop_win10" from NUGET
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_albedo.png").c_str(), nullptr, texture1SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_metal.png").c_str(), nullptr, texture2SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_normals.png").c_str(), nullptr, texture3SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_roughness.png").c_str(), nullptr, texture4SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/floor_albedo.png").c_str(), nullptr, texture5SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/floor_metal.png").c_str(), nullptr, texture6SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/floor_normals.png").c_str(), nullptr, texture7SRV.GetAddressOf());
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/floor_roughness.png").c_str(), nullptr, texture8SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/wood_albedo.png").c_str(), nullptr, texture1SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/wood_metal.png").c_str(), nullptr, texture2SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/wood_normals.png").c_str(), nullptr, texture3SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/wood_roughness.png").c_str(), nullptr, texture4SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/paint_albedo.png").c_str(), nullptr, texture5SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/paint_metal.png").c_str(), nullptr, texture6SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/paint_normals.png").c_str(), nullptr, texture7SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/paint_roughness.png").c_str(), nullptr, texture8SRV.GetAddressOf());
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_albedo.png").c_str(), nullptr, texture9SRV.GetAddressOf());
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_metal.png").c_str(), nullptr, texture10SRV.GetAddressOf());
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_normals.png").c_str(), nullptr, texture11SRV.GetAddressOf());
@@ -90,14 +101,17 @@ void Game::Init()
 
 	// Sky texture
 	CreateDDSTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/SunnyCubeMap.dds").c_str(), nullptr, cubeTexSRV.GetAddressOf());
+	
+	// Cel texture
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/celChart.png").c_str(), nullptr, shadowSRV.GetAddressOf());
 
 	// Create the materials
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShader, vertexShader, texture1SRV, texture2SRV, nullptr, texture4SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture5SRV, texture6SRV, texture7SRV, texture8SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture5SRV, texture6SRV, nullptr, texture8SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture5SRV, texture6SRV, texture7SRV, texture8SRV, samplerState)));
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture9SRV, texture10SRV, texture11SRV, texture12SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShader, vertexShader, texture9SRV, texture10SRV, nullptr, texture12SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture9SRV, texture10SRV, texture11SRV, texture12SRV, samplerState)));
 	
 	// Create the sky
 	sky = std::shared_ptr<Sky>(new Sky(meshes[2], samplerState, device, cubeTexSRV, pixelShaderSky, vertexShaderSky));
@@ -163,6 +177,12 @@ void Game::LoadShaders()
 	// New pixel shader that has normals
 	pixelShaderNormals = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderNormals.cso").c_str()));
 
+	// Special pixel shaders
+	// New pixel shader that has normals and is toone
+	pixelToon = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderToonNormals.cso").c_str()));
+	// New pixel shader that has normals
+	//pixelToon = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderToonNormals.cso").c_str()));
+
 	// Skybox specific vertex shader
 	vertexShaderSky = std::shared_ptr<SimpleVertexShader>(new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShaderSky.cso").c_str()));
 	// Skybox specific pixel shader
@@ -207,6 +227,22 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
+	// Check for input to switch shaders
+	if (GetAsyncKeyState('1') & 0x8000)
+	{
+		for (int i = 0; i < materials.size(); i++)
+		{
+			materials[i]->SetPixelShader(pixelShaderNormals);
+		}
+	}
+	if (GetAsyncKeyState('2') & 0x8000)
+	{
+		for (int i = 0; i < materials.size(); i++)
+		{
+			materials[i]->SetPixelShader(pixelToon);
+		}
+	}
+
 	// Update the tranformations of the entities
 	for (size_t i = 0; i < entities.size(); i++)
 	{
@@ -253,12 +289,14 @@ void Game::Draw(float deltaTime, float totalTime)
 		entities[i]->material->GetPixelShader()->SetShaderResourceView("Albedo", entities[i]->material->GetDiffuseSRV().Get());
 		entities[i]->material->GetPixelShader()->SetShaderResourceView("MetalnessMap", entities[i]->material->GetMetalSRV().Get());
 		entities[i]->material->GetPixelShader()->SetShaderResourceView("RoughnessMap", entities[i]->material->GetRoughSRV().Get());
+		entities[i]->material->GetPixelShader()->SetShaderResourceView("ShadowChart", shadowSRV.Get());
 		// Check for if it has a normal
 		if (entities[i]->material->GetNormalsSRV() != nullptr)
 		{
 			entities[i]->material->GetPixelShader()->SetShaderResourceView("NormalMap", entities[i]->material->GetNormalsSRV().Get());
 		}
 		entities[i]->material->GetPixelShader()->SetSamplerState("samplerOptions", samplerState.Get());
+		entities[i]->material->GetPixelShader()->SetSamplerState("samplerState2", samplerState2.Get());
 		// Send the data actually into the shader
 		entities[i]->material->GetPixelShader()->CopyAllBufferData();
 		entities[i]->Draw(context, camera);

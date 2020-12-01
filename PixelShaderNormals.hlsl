@@ -14,9 +14,11 @@ Texture2D Albedo : register(t0);
 Texture2D RoughnessMap : register(t1);
 Texture2D MetalnessMap : register(t2);
 Texture2D NormalMap : register(t3);
+Texture2D ShadowChart : register(t4);
 
 // Sampler state options like texture wrapping, and distance
 SamplerState samplerOptions : register(s0);
+SamplerState samplerState2 : register(s1);
 
 // Helper method for get TBN matrix
 float3x3 GetTBN(VertexToPixelNormals input)
@@ -43,6 +45,7 @@ float4 main(VertexToPixelNormals input) : SV_TARGET
 	// Rough and Metal
 	float roughness = RoughnessMap.Sample(samplerOptions, input.uv).r;
 	float metalness = MetalnessMap.Sample(samplerOptions, input.uv).r;
+	float shadows = ShadowChart.Sample(samplerOptions, input.uv).r;
 
 	// Get normals to be from -1 to 1 instead of 0 to 1
 	float3 vectorNormal = NormalMap.Sample(samplerOptions, input.uv).rgb * 2 - 1;

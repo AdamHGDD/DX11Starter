@@ -35,6 +35,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetNormalsSRV();
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetRoughSRV();
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> GetSamplerState();
+	void SetPixelShader(std::shared_ptr<SimplePixelShader> value);
 	std::shared_ptr<SimplePixelShader> GetPixelShader();
 	std::shared_ptr<SimpleVertexShader> GetVertexShader();
 };

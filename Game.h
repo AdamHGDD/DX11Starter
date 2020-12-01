@@ -46,6 +46,7 @@ private:
 	std::shared_ptr<SimplePixelShader> pixelShader;
 	std::shared_ptr<SimpleVertexShader> vertexShader;
 	std::shared_ptr<SimplePixelShader> pixelShaderNormals;
+	std::shared_ptr<SimplePixelShader> pixelToon;
 	std::shared_ptr<SimpleVertexShader> vertexShaderNormals;
 	std::shared_ptr<SimplePixelShader> pixelShaderSky;
 	std::shared_ptr<SimpleVertexShader> vertexShaderSky;
@@ -71,10 +72,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture10SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture11SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture12SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shadowSRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cubeTexSRV;
 
 	// Sampler state for textures
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState2;
 	D3D11_SAMPLER_DESC samplerDesc;
 
 	DirectionalLight dLight;

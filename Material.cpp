@@ -25,4 +25,5 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> Material::GetNormalsSRV() { ret
 Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> Material::GetRoughSRV() { return roughSRV; }
 Microsoft::WRL::ComPtr<ID3D11SamplerState> Material::GetSamplerState() { return samplerState; }
 std::shared_ptr<SimplePixelShader> Material::GetPixelShader() { return pixelShader; }
+void Material::SetPixelShader(std::shared_ptr<SimplePixelShader> value) { pixelShader = value; }
 std::shared_ptr<SimpleVertexShader> Material::GetVertexShader() { return vertexShader; }
