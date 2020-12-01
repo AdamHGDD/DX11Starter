@@ -180,6 +180,14 @@ struct VertexToPixelSky
 	float3 sampleDir		: DIRECTION;
 };
 
+// Post process
+struct VertexToPixelPP
+{
+	// Data type	Name	Semantic
+	float4 position		: SV_POSITION;
+	float2 uv			: TEXCOORD0;
+};
+
 // Struct for passing in directional light data
 struct DirectionalLight
 {

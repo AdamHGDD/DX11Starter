@@ -31,6 +31,7 @@ private:
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders(); 
 	void CreateBasicGeometry();
+	void ResizePostProcessResources();
 
 	
 	// Note the usage of ComPtr below
@@ -46,10 +47,15 @@ private:
 	std::shared_ptr<SimplePixelShader> pixelShader;
 	std::shared_ptr<SimpleVertexShader> vertexShader;
 	std::shared_ptr<SimplePixelShader> pixelShaderNormals;
-	std::shared_ptr<SimplePixelShader> pixelToon;
 	std::shared_ptr<SimpleVertexShader> vertexShaderNormals;
 	std::shared_ptr<SimplePixelShader> pixelShaderSky;
 	std::shared_ptr<SimpleVertexShader> vertexShaderSky;
+
+	// Final project pixel shaders
+	std::shared_ptr<SimplePixelShader> pixelToon;
+	std::shared_ptr<SimplePixelShader> pixelToonPostProcess;
+	std::shared_ptr<SimplePixelShader> pixelHatchPostProcess;
+	std::shared_ptr<SimpleVertexShader> postProcessVS;
 
 	// CBuffer
 	//	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBufferVS;
@@ -72,6 +78,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture10SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture11SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture12SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture13SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture14SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture15SRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture16SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shadowSRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cubeTexSRV;
 
@@ -85,5 +95,16 @@ private:
 
 	// Skybox
 	std::shared_ptr<Sky> sky;
+
+	// Post process related data
+	bool postProcessing = false;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> ppRTV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ppSRV;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> sceneDepthRTV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sceneDepthSRV;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> sceneNormalsRTV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sceneNormalsSRV;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> sceneShadowsRTV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sceneShadowsSRV;
 };
 

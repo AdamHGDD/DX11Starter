@@ -50,6 +50,61 @@ Game::~Game()
 
 }
 
+// Not original code, came from your code
+void Game::ResizePostProcessResources()
+{
+	D3D11_TEXTURE2D_DESC textureDesc = {};
+	textureDesc.Width = width;
+	textureDesc.Height = height;
+	textureDesc.ArraySize = 1;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE; // Will render to it and sample from it!
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	textureDesc.MipLevels = 1;
+	textureDesc.MiscFlags = 0;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+
+	// Create the color and normals textures
+	ID3D11Texture2D* ppTexture;
+
+	device->CreateTexture2D(&textureDesc, 0, &ppTexture);
+
+	// Adjust the description for scene normals
+	textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+	ID3D11Texture2D* sceneNormalsTexture;
+	device->CreateTexture2D(&textureDesc, 0, &sceneNormalsTexture);
+
+	// Adjust the description for the scene depths
+	textureDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	ID3D11Texture2D* sceneDepthsTexture;
+	device->CreateTexture2D(&textureDesc, 0, &sceneDepthsTexture);
+
+	// Adjust the description for the shadows
+	textureDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	ID3D11Texture2D* sceneShadowsTexture;
+	device->CreateTexture2D(&textureDesc, 0, &sceneShadowsTexture);
+
+	// Create the Render Target Views
+	device->CreateRenderTargetView(ppTexture, 0, ppRTV.ReleaseAndGetAddressOf());
+	device->CreateRenderTargetView(sceneNormalsTexture, 0, sceneNormalsRTV.ReleaseAndGetAddressOf());
+	device->CreateRenderTargetView(sceneDepthsTexture, 0, sceneDepthRTV.ReleaseAndGetAddressOf());
+	device->CreateRenderTargetView(sceneShadowsTexture, 0, sceneShadowsRTV.ReleaseAndGetAddressOf());
+
+	// Create the Shader Resource Views
+	device->CreateShaderResourceView(ppTexture, 0, ppSRV.ReleaseAndGetAddressOf());
+	device->CreateShaderResourceView(sceneNormalsTexture, 0, sceneNormalsSRV.ReleaseAndGetAddressOf());
+	device->CreateShaderResourceView(sceneDepthsTexture, 0, sceneDepthSRV.ReleaseAndGetAddressOf());
+	device->CreateShaderResourceView(sceneShadowsTexture, 0, sceneShadowsSRV.ReleaseAndGetAddressOf());
+
+	// Release the extra texture references
+	ppTexture->Release();
+	sceneNormalsTexture->Release();
+	sceneDepthsTexture->Release();
+	sceneShadowsTexture->Release();
+}
+
 // --------------------------------------------------------
 // Called once per program, after DirectX and the window
 // are initialized but before the game loop.
@@ -98,6 +153,10 @@ void Game::Init()
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_metal.png").c_str(), nullptr, texture10SRV.GetAddressOf());
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_normals.png").c_str(), nullptr, texture11SRV.GetAddressOf());
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/scratched_roughness.png").c_str(), nullptr, texture12SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_albedo.png").c_str(), nullptr, texture13SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_metal.png").c_str(), nullptr, texture14SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_normals.png").c_str(), nullptr, texture15SRV.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cobblestone_roughness.png").c_str(), nullptr, texture16SRV.GetAddressOf());
 
 	// Sky texture
 	CreateDDSTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/SunnyCubeMap.dds").c_str(), nullptr, cubeTexSRV.GetAddressOf());
@@ -155,6 +214,9 @@ void Game::Init()
 	pLight.ambientColor = XMFLOAT3(0.01f, 0.03f, 0.01f);
 	pLight.diffuseColor = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	pLight.position = XMFLOAT3(0, 0, 0);
+
+	// Set up post process stuff
+	ResizePostProcessResources();
 }
 
 // --------------------------------------------------------
@@ -180,8 +242,11 @@ void Game::LoadShaders()
 	// Special pixel shaders
 	// New pixel shader that has normals and is toone
 	pixelToon = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderToonNormals.cso").c_str()));
-	// New pixel shader that has normals
-	//pixelToon = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderToonNormals.cso").c_str()));
+	
+	// Post processing shaders
+	postProcessVS = std::shared_ptr<SimpleVertexShader>(new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShaderPP.cso").c_str()));
+	pixelToonPostProcess = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderToonPostProcess.cso").c_str()));
+	pixelHatchPostProcess = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderToonPostProcess.cso").c_str()));
 
 	// Skybox specific vertex shader
 	vertexShaderSky = std::shared_ptr<SimpleVertexShader>(new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShaderSky.cso").c_str()));
@@ -220,6 +285,8 @@ void Game::OnResize()
 		// Update aspect ratio
 		camera->UpdateProjectionMatrix((float)this->width / this->height);
 	}
+	// Post process
+	ResizePostProcessResources();
 }
 
 // --------------------------------------------------------
@@ -230,6 +297,7 @@ void Game::Update(float deltaTime, float totalTime)
 	// Check for input to switch shaders
 	if (GetAsyncKeyState('1') & 0x8000)
 	{
+		postProcessing = false;
 		for (int i = 0; i < materials.size(); i++)
 		{
 			materials[i]->SetPixelShader(pixelShaderNormals);
@@ -237,6 +305,15 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 	if (GetAsyncKeyState('2') & 0x8000)
 	{
+		postProcessing = true;
+		for (int i = 0; i < materials.size(); i++)
+		{
+			materials[i]->SetPixelShader(pixelToon);
+		}
+	}
+	if (GetAsyncKeyState('3') & 0x8000)
+	{
+		postProcessing = true;
 		for (int i = 0; i < materials.size(); i++)
 		{
 			materials[i]->SetPixelShader(pixelToon);
@@ -276,6 +353,25 @@ void Game::Draw(float deltaTime, float totalTime)
 		1.0f,
 		0);
 
+	// Set up post processing rendering
+	if (postProcessing)
+	{
+		context->ClearRenderTargetView(ppRTV.Get(), color);
+		context->ClearRenderTargetView(sceneNormalsRTV.Get(), color);
+		context->ClearRenderTargetView(sceneDepthRTV.Get(), color);
+		context->ClearRenderTargetView(sceneShadowsRTV.Get(), color);
+
+		// Set post processing rendertargets
+		ID3D11RenderTargetView* rtvs[4] =
+		{
+			ppRTV.Get(),
+			sceneNormalsRTV.Get(),
+			sceneDepthRTV.Get(),
+			sceneShadowsRTV.Get()
+		};
+		context->OMSetRenderTargets(4, rtvs, depthStencilView.Get());
+	}
+
 	
 	// Draw all game entities
 	for (size_t i = 0; i < entities.size(); i++)
@@ -306,6 +402,45 @@ void Game::Draw(float deltaTime, float totalTime)
 	sky->Draw(context, camera);
 
 
+	// Render post processing
+	if (postProcessing)
+	{
+		// Now that the scene is rendered, swap to the back buffer
+		context->OMSetRenderTargets(1, backBufferRTV.GetAddressOf(), 0);
+
+		// Set up post process shaders
+		postProcessVS->SetShader();
+
+		pixelToonPostProcess->SetShaderResourceView("PixelsRender", ppSRV.Get());
+		pixelToonPostProcess->SetShaderResourceView("NormalsRender", sceneNormalsSRV.Get());
+		pixelToonPostProcess->SetShaderResourceView("DepthsRender", sceneDepthSRV.Get());
+		pixelToonPostProcess->SetShaderResourceView("ShadowsRender", sceneShadowsSRV.Get());
+		pixelToonPostProcess->SetSamplerState("samplerOptions", samplerState2.Get());
+		pixelToonPostProcess->SetShader();
+
+		// Send over window size data
+		pixelToonPostProcess->SetFloat("pixelWidth", 1.0f / width);
+		pixelToonPostProcess->SetFloat("pixelHeight", 1.0f / height);
+		pixelToonPostProcess->SetFloat("depthAdjust", 5.0f);
+		pixelToonPostProcess->SetFloat("normalAdjust", 5.0f);
+		pixelToonPostProcess->CopyAllBufferData();
+
+		// Turn OFF my vertex and index buffers
+		context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+		ID3D11Buffer* nothing = 0;
+		context->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
+
+		// Draw exactly 3 vertices, which the special post-process vertex shader will
+		// "figure out" on the fly (resulting in our "full screen triangle")
+		context->Draw(3, 0);
+	}
+
+	ID3D11ShaderResourceView* nullSRVs[16] = {};
+	context->PSSetShaderResources(0, 16, nullSRVs);
+
+
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
@@ -314,4 +449,5 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Due to the usage of a more sophisticated swap chain,
 	// the render target must be re-bound after every call to Present()
 	context->OMSetRenderTargets(1, backBufferRTV.GetAddressOf(), depthStencilView.Get());
+
 }
