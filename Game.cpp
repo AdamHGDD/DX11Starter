@@ -71,6 +71,11 @@ void Game::ResizePostProcessResources()
 
 	device->CreateTexture2D(&textureDesc, 0, &ppTexture);
 
+	// Again for shadows
+	ID3D11Texture2D* sceneShadowsTexture;
+	device->CreateTexture2D(&textureDesc, 0, &sceneShadowsTexture);
+
+
 	// Adjust the description for scene normals
 	textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 	ID3D11Texture2D* sceneNormalsTexture;
@@ -80,11 +85,6 @@ void Game::ResizePostProcessResources()
 	textureDesc.Format = DXGI_FORMAT_R32_FLOAT;
 	ID3D11Texture2D* sceneDepthsTexture;
 	device->CreateTexture2D(&textureDesc, 0, &sceneDepthsTexture);
-
-	// Adjust the description for the shadows
-	textureDesc.Format = DXGI_FORMAT_R32_FLOAT;
-	ID3D11Texture2D* sceneShadowsTexture;
-	device->CreateTexture2D(&textureDesc, 0, &sceneShadowsTexture);
 
 	// Create the Render Target Views
 	device->CreateRenderTargetView(ppTexture, 0, ppRTV.ReleaseAndGetAddressOf());
@@ -349,7 +349,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->ClearRenderTargetView(backBufferRTV.Get(), color);
 	context->ClearDepthStencilView(
 		depthStencilView.Get(),
-		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+		D3D11_CLEAR_DEPTH,
 		1.0f,
 		0);
 
@@ -365,9 +365,9 @@ void Game::Draw(float deltaTime, float totalTime)
 		ID3D11RenderTargetView* rtvs[4] =
 		{
 			ppRTV.Get(),
+			sceneShadowsRTV.Get(),
 			sceneNormalsRTV.Get(),
-			sceneDepthRTV.Get(),
-			sceneShadowsRTV.Get()
+			sceneDepthRTV.Get()
 		};
 		context->OMSetRenderTargets(4, rtvs, depthStencilView.Get());
 	}

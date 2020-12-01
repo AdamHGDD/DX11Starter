@@ -25,7 +25,7 @@ float4 main(VertexToPixelPP input) : SV_TARGET
 	float2 rPixel = input.uv + float2(pixelWidth, 0);
 	float2 dPixel = input.uv + float2(0, -pixelHeight);
 	float2 uPixel = input.uv + float2(0, pixelHeight);
-	
+
 	// COMPARE DEPTHS --------------------------
 
 	// Sample the depths of this pixel and the surrounding pixels
@@ -62,15 +62,15 @@ float4 main(VertexToPixelPP input) : SV_TARGET
 
 	// Total the components
 	float normalTotal = pow(saturate(normalChange.x + normalChange.y + normalChange.z), normalAdjust);
-	
+
 	// COMPARE Shadows --------------------------
 
 	// Sample the normals of this pixel and the surrounding pixels
-	float shadowHere = ShadowsRender.Sample(samplerOptions, input.uv).r;
-	float shadowLeft = ShadowsRender.Sample(samplerOptions, lPixel).r;
-	float shadowRight = ShadowsRender.Sample(samplerOptions, rPixel).r;
-	float shadowUp = ShadowsRender.Sample(samplerOptions, dPixel).r;
-	float shadowDown = ShadowsRender.Sample(samplerOptions, uPixel).r;
+	float3 shadowHere = ShadowsRender.Sample(samplerOptions, input.uv).rgb;
+	float3 shadowLeft = ShadowsRender.Sample(samplerOptions, lPixel).rgb;
+	float3 shadowRight = ShadowsRender.Sample(samplerOptions, rPixel).rgb;
+	float3 shadowUp = ShadowsRender.Sample(samplerOptions, dPixel).rgb;
+	float3 shadowDown = ShadowsRender.Sample(samplerOptions, uPixel).rgb;
 
 	// Calculate how the normal changes by summing the absolute values of the differences
 	float3 shadowChange =
@@ -80,17 +80,12 @@ float4 main(VertexToPixelPP input) : SV_TARGET
 		abs(shadowHere - shadowDown);
 
 	// Total the components
-	float shadowTotal = pow(saturate(shadowChange), 5);
+	float shadowTotal = pow(saturate(shadowChange.x + shadowChange.y + shadowChange.z), 5);
 
 	// FINAL COLOR VALUE -----------------------------
 
 	// Which result, depth or normal, is more impactful?
 	float outline = max(max(depthTotal, normalTotal), shadowTotal);
 
-	// Sample the color here
-	float3 color = PixelsRender.Sample(samplerOptions, input.uv).rgb;
-
-	// Interpolate between this color and the outline
-	float3 finalColor = lerp(color, float3(0, 0, 0), outline);
-	return float4(finalColor, 1);
+	return outline.xxxx;
 }
