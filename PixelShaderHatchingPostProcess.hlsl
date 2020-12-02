@@ -13,6 +13,7 @@ Texture2D PixelsRender : register(t0);
 Texture2D ShadowsRender : register(t1);
 Texture2D NormalsRender : register(t2);
 Texture2D DepthsRender : register(t3);
+Texture2D Stipple : register(t4);
 
 // Sampler
 SamplerState samplerOptions	: register(s0);
@@ -25,7 +26,7 @@ float4 main(VertexToPixelPP input) : SV_TARGET
 	float2 rPixel = input.uv + float2(pixelWidth, 0);
 	float2 dPixel = input.uv + float2(0, -pixelHeight);
 	float2 uPixel = input.uv + float2(0, pixelHeight);
-	
+
 	// COMPARE DEPTHS --------------------------
 
 	// Sample the depths of this pixel and the surrounding pixels
@@ -62,7 +63,7 @@ float4 main(VertexToPixelPP input) : SV_TARGET
 
 	// Total the components
 	float normalTotal = pow(saturate(normalChange.x + normalChange.y + normalChange.z), normalAdjust);
-	
+
 	// COMPARE Shadows --------------------------
 
 	// Sample the normals of this pixel and the surrounding pixels
@@ -88,9 +89,21 @@ float4 main(VertexToPixelPP input) : SV_TARGET
 	float outline = max(max(depthTotal, normalTotal), shadowTotal);
 
 	// Sample the color here
-	float3 color = PixelsRender.Sample(samplerOptions, input.uv).rgb;
+	float3 color = ShadowsRender.Sample(samplerOptions, input.uv).ggg;
 
 	// Interpolate between this color and the outline
 	float3 finalColor = lerp(color, float3(0, 0, 0), outline);
+	if (shadowHere < .98f && shadowHere > .8f && depthHere > .47f)
+	{
+		return float4(finalColor, 1) - Stipple.Sample(samplerOptions, float2(input.uv.x % .33f + .66f, input.uv.y));
+	}
+	else if (shadowHere <= .8f && shadowHere > .5f && depthHere > .47f)
+	{
+		return float4(finalColor, 1) - Stipple.Sample(samplerOptions, float2(input.uv.x % .33f + .33f, input.uv.y));
+	}
+	else if (shadowHere <= .5f && shadowHere > .25f && depthHere > .47f)
+	{
+		return float4(finalColor, 1) - Stipple.Sample(samplerOptions, float2(input.uv.x % .33f, input.uv.y));
+	}
 	return float4(finalColor, 1);
 }

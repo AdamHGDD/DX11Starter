@@ -32,6 +32,7 @@ private:
 	void LoadShaders(); 
 	void CreateBasicGeometry();
 	void ResizePostProcessResources();
+	void InputCheck();
 
 	
 	// Note the usage of ComPtr below
@@ -53,8 +54,7 @@ private:
 
 	// Final project pixel shaders
 	std::shared_ptr<SimplePixelShader> pixelToon;
-	std::shared_ptr<SimplePixelShader> pixelToonPostProcess;
-	std::shared_ptr<SimplePixelShader> pixelHatchPostProcess;
+	std::shared_ptr<SimplePixelShader> pixelPostProcess;
 	std::shared_ptr<SimpleVertexShader> postProcessVS;
 
 	// CBuffer
@@ -83,6 +83,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture15SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture16SRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shadowSRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> stippleSRV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> cubeTexSRV;
 
 	// Sampler state for textures
@@ -98,6 +99,7 @@ private:
 
 	// Post process related data
 	bool postProcessing = false;
+	bool stipple = false;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> ppRTV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ppSRV;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> sceneDepthRTV;

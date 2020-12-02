@@ -66,26 +66,26 @@ float4 main(VertexToPixelPP input) : SV_TARGET
 	// COMPARE Shadows --------------------------
 
 	// Sample the normals of this pixel and the surrounding pixels
-	float3 shadowHere = ShadowsRender.Sample(samplerOptions, input.uv).rgb;
-	float3 shadowLeft = ShadowsRender.Sample(samplerOptions, lPixel).rgb;
-	float3 shadowRight = ShadowsRender.Sample(samplerOptions, rPixel).rgb;
-	float3 shadowUp = ShadowsRender.Sample(samplerOptions, dPixel).rgb;
-	float3 shadowDown = ShadowsRender.Sample(samplerOptions, uPixel).rgb;
+	float shadowHere = ShadowsRender.Sample(samplerOptions, input.uv).r;
+	float shadowLeft = ShadowsRender.Sample(samplerOptions, lPixel).r;
+	float shadowRight = ShadowsRender.Sample(samplerOptions, rPixel).r;
+	float shadowUp = ShadowsRender.Sample(samplerOptions, dPixel).r;
+	float shadowDown = ShadowsRender.Sample(samplerOptions, uPixel).r;
 
 	// Calculate how the normal changes by summing the absolute values of the differences
-	float3 shadowChange =
+	float shadowChange =
 		abs(shadowHere - shadowLeft) +
 		abs(shadowHere - shadowRight) +
 		abs(shadowHere - shadowUp) +
 		abs(shadowHere - shadowDown);
 
 	// Total the components
-	float shadowTotal = pow(saturate(shadowChange.x + shadowChange.y + shadowChange.z), 5);
+	float shadowTotal = pow(saturate(shadowChange * 4), 5);
 
 	// FINAL COLOR VALUE -----------------------------
 
 	// Which result, depth or normal, is more impactful?
-	float outline = max(max(depthTotal, normalTotal), shadowTotal);
+	float outline = 1 - max(max(depthTotal, normalTotal), shadowTotal);
 
 	return outline.xxxx;
 }

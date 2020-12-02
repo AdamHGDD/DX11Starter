@@ -164,6 +164,9 @@ void Game::Init()
 	// Cel texture
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/celChart.png").c_str(), nullptr, shadowSRV.GetAddressOf());
 
+	// Stipple texture
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/stipple.png").c_str(), nullptr, stippleSRV.GetAddressOf());
+
 	// Create the materials
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
 	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
@@ -245,8 +248,7 @@ void Game::LoadShaders()
 	
 	// Post processing shaders
 	postProcessVS = std::shared_ptr<SimpleVertexShader>(new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShaderPP.cso").c_str()));
-	pixelToonPostProcess = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderToonPostProcess.cso").c_str()));
-	pixelHatchPostProcess = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderToonPostProcess.cso").c_str()));
+	pixelPostProcess = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderToonPostProcess.cso").c_str()));
 
 	// Skybox specific vertex shader
 	vertexShaderSky = std::shared_ptr<SimpleVertexShader>(new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShaderSky.cso").c_str()));
@@ -289,15 +291,15 @@ void Game::OnResize()
 	ResizePostProcessResources();
 }
 
-// --------------------------------------------------------
-// Update your game here - user input, move objects, AI, etc.
-// --------------------------------------------------------
-void Game::Update(float deltaTime, float totalTime)
+
+// Method for switching between post processing types
+void Game::InputCheck()
 {
 	// Check for input to switch shaders
 	if (GetAsyncKeyState('1') & 0x8000)
 	{
 		postProcessing = false;
+		stipple = false;
 		for (int i = 0; i < materials.size(); i++)
 		{
 			materials[i]->SetPixelShader(pixelShaderNormals);
@@ -305,20 +307,52 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 	if (GetAsyncKeyState('2') & 0x8000)
 	{
+		// Enable toon shading
 		postProcessing = true;
+		stipple = false;
+		// Set post processing shader to be toon shading
+		pixelPostProcess = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderToonPostProcess.cso").c_str()));
 		for (int i = 0; i < materials.size(); i++)
 		{
+			// Set shadow type
 			materials[i]->SetPixelShader(pixelToon);
 		}
 	}
 	if (GetAsyncKeyState('3') & 0x8000)
 	{
+		// Enable toon shading
 		postProcessing = true;
+		stipple = false;
+		// Set post processing shader to be hatching shading
+		pixelPostProcess = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderOutlinePostProcess.cso").c_str()));
 		for (int i = 0; i < materials.size(); i++)
 		{
+			// Set shadow type
 			materials[i]->SetPixelShader(pixelToon);
 		}
 	}
+	if (GetAsyncKeyState('4') & 0x8000)
+	{
+		// Enable toon shading
+		postProcessing = true;
+		stipple = true;
+		// Set post processing shader to be hatching shading
+		pixelPostProcess = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderHatchingPostProcess.cso").c_str()));
+		for (int i = 0; i < materials.size(); i++)
+		{
+			// Set shadow type
+			materials[i]->SetPixelShader(pixelToon);
+		}
+	}
+}
+
+// --------------------------------------------------------
+// Update your game here - user input, move objects, AI, etc.
+// --------------------------------------------------------
+void Game::Update(float deltaTime, float totalTime)
+{
+	// Check for input to switch shaders
+	InputCheck();
 
 	// Update the tranformations of the entities
 	for (size_t i = 0; i < entities.size(); i++)
@@ -411,19 +445,23 @@ void Game::Draw(float deltaTime, float totalTime)
 		// Set up post process shaders
 		postProcessVS->SetShader();
 
-		pixelToonPostProcess->SetShaderResourceView("PixelsRender", ppSRV.Get());
-		pixelToonPostProcess->SetShaderResourceView("NormalsRender", sceneNormalsSRV.Get());
-		pixelToonPostProcess->SetShaderResourceView("DepthsRender", sceneDepthSRV.Get());
-		pixelToonPostProcess->SetShaderResourceView("ShadowsRender", sceneShadowsSRV.Get());
-		pixelToonPostProcess->SetSamplerState("samplerOptions", samplerState2.Get());
-		pixelToonPostProcess->SetShader();
+		pixelPostProcess->SetShaderResourceView("PixelsRender", ppSRV.Get());
+		pixelPostProcess->SetShaderResourceView("NormalsRender", sceneNormalsSRV.Get());
+		pixelPostProcess->SetShaderResourceView("DepthsRender", sceneDepthSRV.Get());
+		pixelPostProcess->SetShaderResourceView("ShadowsRender", sceneShadowsSRV.Get());
+		if (stipple)
+		{
+			pixelPostProcess->SetShaderResourceView("Stipple", stippleSRV.Get());
+		}
+		pixelPostProcess->SetSamplerState("samplerOptions", samplerState2.Get());
+		pixelPostProcess->SetShader();
 
 		// Send over window size data
-		pixelToonPostProcess->SetFloat("pixelWidth", 1.0f / width);
-		pixelToonPostProcess->SetFloat("pixelHeight", 1.0f / height);
-		pixelToonPostProcess->SetFloat("depthAdjust", 5.0f);
-		pixelToonPostProcess->SetFloat("normalAdjust", 5.0f);
-		pixelToonPostProcess->CopyAllBufferData();
+		pixelPostProcess->SetFloat("pixelWidth", 1.0f / width);
+		pixelPostProcess->SetFloat("pixelHeight", 1.0f / height);
+		pixelPostProcess->SetFloat("depthAdjust", 5.0f);
+		pixelPostProcess->SetFloat("normalAdjust", 5.0f);
+		pixelPostProcess->CopyAllBufferData();
 
 		// Turn OFF my vertex and index buffers
 		context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);

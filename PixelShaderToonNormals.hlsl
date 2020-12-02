@@ -72,9 +72,9 @@ Output main(VertexToPixelNormals input) : SV_TARGET
 	finalColor += CalcLight(input, cameraPos, pLight.AmbientColor, pLight.DiffuseColor, pointDirection, surfaceColor, roughness, metalness, ShadowChart, samplerState2);
 
 	// Mimic this for the shadows
-	shadowColor += CalcLight(input, cameraPos, dLight.AmbientColor, dLight.DiffuseColor, -dLight.Direction, float3(1, 1, 1), roughness, metalness, ShadowChart, samplerState2);
+	shadowColor += CalcLight(input, cameraPos, dLight.AmbientColor, dLight.DiffuseColor, -dLight.Direction, float3(1, 1, 1), 0, 0, ShadowChart, samplerState2);
 	// Calc Light for the point light
-	shadowColor += CalcLight(input, cameraPos, pLight.AmbientColor, pLight.DiffuseColor, pointDirection, float3(1, 1, 1), roughness, metalness, ShadowChart, samplerState2);
+	shadowColor += CalcLight(input, cameraPos, pLight.AmbientColor, pLight.DiffuseColor, pointDirection, float3(1, 1, 1), 0, 0, ShadowChart, samplerState2);
 
 
 	// Just return the input color
