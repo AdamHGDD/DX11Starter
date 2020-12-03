@@ -22,6 +22,7 @@ public:
 	// Overridden setup and game loop methods, which
 	// will be called automatically
 	void Init();
+	void CreateObjects();
 	void OnResize();
 	void Update(float deltaTime, float totalTime);
 	void Draw(float deltaTime, float totalTime);
@@ -54,6 +55,7 @@ private:
 
 	// Final project pixel shaders
 	std::shared_ptr<SimplePixelShader> pixelToon;
+	std::shared_ptr<SimplePixelShader> pixelStipple;
 	std::shared_ptr<SimplePixelShader> pixelPostProcess;
 	std::shared_ptr<SimpleVertexShader> postProcessVS;
 

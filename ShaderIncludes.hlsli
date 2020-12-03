@@ -326,4 +326,46 @@ float3 CalcLight(VertexToPixelNormals input, float3 cameraPos,
 };
 
 
+float3 CalcLightS(VertexToPixelNormals input, float3 cameraPos,
+	float3 ambientColor, float3 diffuseColor, float3 direction, float3 surfaceColor,
+	float roughness, float metalness,
+	Texture2D shadowChart, SamplerState samplerOptions)
+{
+	// Lighting calculations
+	// Normalize needed vectors
+	float3 normal = normalize(input.normal);
+	float3 dir = normalize(direction);
+
+	// Figure out how lit the object can be
+	float3 lightAmount = saturate(dot(normal, dir));
+
+	// Ambient
+	float3 ambient = ambientColor;
+	float3 lightColor = float3(0, 0, 0);
+
+	// Specularity vectors
+	float3 V = normalize(cameraPos - input.worldPos);
+
+	// Specular
+	float3 specularColor = lerp(F0_NON_METAL.rrr, surfaceColor.rgb, metalness);
+	// Specularity calculation
+	float3 spec = MicrofacetBRDF(normal, dir, V, roughness, metalness, specularColor);
+
+	// Conservation of energy
+	float3 balancedDiff = DiffuseEnergyConserve(lightAmount, spec, metalness);
+
+	// Cel shaded versions of spec and balanced diff
+	// at balanced diff.x
+	balancedDiff = 1 - shadowChart.Sample(samplerOptions, float2(balancedDiff.x - balancedDiff.x % .25f + input.uv.x % .25, input.uv.y)).rrr;
+	// at spec.x
+	spec = 1 - shadowChart.Sample(samplerOptions, float2(spec.x - spec.x % .25f + input.uv.x % .25f, input.uv.y)).rrr;
+
+	// Finishing conservation of energy
+	lightColor += balancedDiff * surfaceColor ;
+
+
+	// Return the light created by this light specifically
+	return lightColor;
+};
+
 #endif

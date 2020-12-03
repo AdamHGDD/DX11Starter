@@ -105,6 +105,131 @@ void Game::ResizePostProcessResources()
 	sceneShadowsTexture->Release();
 }
 
+// Method for creating the scene
+void Game::CreateObjects()
+{
+	// Create floor
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[3])));
+	// Move floor into place
+	entities[0]->GetTransform()->SetPosition(0, 0, 0);
+	entities[0]->GetTransform()->SetScale(20, 1, 20);
+
+
+	// Create wall 1
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[1])));
+	// Move wall 1 into place
+	entities[1]->GetTransform()->SetPosition(-9.5f, 4.5f, 0);
+	entities[1]->GetTransform()->SetScale(20, 10, 1);
+	entities[1]->GetTransform()->SetRotation(0, 3.14159265f / 2, 0);
+	// Create wall 2
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[1])));
+	// Move wall 2 into place
+	entities[2]->GetTransform()->SetPosition(9.5f, 4.5f, 0);
+	entities[2]->GetTransform()->SetScale(20, 10, 1);
+	entities[2]->GetTransform()->SetRotation(0, 3.14159265f / 2, 0);
+	// Create wall 3
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[1])));
+	// Move wall 3 into place
+	entities[3]->GetTransform()->SetPosition(0, 4.5, 9.5);
+	entities[3]->GetTransform()->SetScale(20, 10, 1);
+	// Create wall 4
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[1])));
+	// Move wall 4 into place
+	entities[4]->GetTransform()->SetPosition(0, 4.5, -9.5);
+	entities[4]->GetTransform()->SetScale(20, 10, 1);
+
+
+	// Create center pillar
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[0])));
+	// Move center pillar into place
+	entities[5]->GetTransform()->SetPosition(0, 2.25, 0);
+	entities[5]->GetTransform()->SetScale(2, 5, 2);
+	entities[5]->GetTransform()->SetRotation(0, 3.14159265f / 4, 0);
+
+
+	// Create ceiling
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[1])));
+	// Move floor into place
+	entities[6]->GetTransform()->SetPosition(0, 9, 0);
+	entities[6]->GetTransform()->SetScale(20, 1, 20);
+
+
+	// Create bench seat
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[0])));
+	// Move bench seat into place
+	entities[7]->GetTransform()->SetPosition(-6.75f, 2.375f, 0);
+	entities[7]->GetTransform()->SetScale(2.75f, 0.25f, 8.25f);
+	// Create bench back
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[0])));
+	// Move bench back into place
+	entities[8]->GetTransform()->SetPosition(-8, 3.5f, 0);
+	entities[8]->GetTransform()->SetScale(0.25f, 2, 8.25f);
+	// Create bench leg 1
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[0])));
+	// Move bench leg 1 into place
+	entities[9]->GetTransform()->SetPosition(-5.5f, 1.5f, 4);
+	entities[9]->GetTransform()->SetScale(0.25f, 2, 0.25f);
+	// Create bench leg 2
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[0])));
+	// Move bench leg 2 into place
+	entities[10]->GetTransform()->SetPosition(-8, 1.5f, 4);
+	entities[10]->GetTransform()->SetScale(0.25f, 2, 0.25f);
+	// Create bench leg 3
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[0])));
+	// Move bench leg 3 into place
+	entities[11]->GetTransform()->SetPosition(-5.5f, 1.5f, -4);
+	entities[11]->GetTransform()->SetScale(0.25f, 2, 0.25f);
+	// Create bench leg 4
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[2], materials[0])));
+	// Move bench leg 4 into place
+	entities[12]->GetTransform()->SetPosition(-8, 1.5f, -4);
+	entities[12]->GetTransform()->SetScale(0.25f, 2, 0.25f);
+
+
+	// Create piece holder 1
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[3], materials[0])));
+	// Move piece holder 1 into place
+	entities[13]->GetTransform()->SetPosition(.5f, .35f, 1.1f);
+	entities[13]->GetTransform()->SetScale(0.25f, 6, 0.25f);
+	// Create piece holder 2
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[3], materials[0])));
+	// Move piece holder 2 into place
+	entities[14]->GetTransform()->SetPosition(1.1f, .35f, .5f);
+	entities[14]->GetTransform()->SetScale(0.25f, 6, 0.25f);
+	// Create piece holder 3
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[3], materials[0])));
+	// Move piece holder 3 into place
+	entities[15]->GetTransform()->SetPosition(-1.1f, .35f, -.5f);
+	entities[15]->GetTransform()->SetScale(0.25f, 6, 0.25f);
+	// Create piece holder 4
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[3], materials[0])));
+	// Move piece holder 4 into place
+	entities[16]->GetTransform()->SetPosition(-.5f, .35f, -1.1f);
+	entities[16]->GetTransform()->SetScale(0.25f, 6, 0.25f);
+
+
+	// Create abstract piece 1
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[0], materials[2])));
+	// Move piece holder 1 into place
+	entities[17]->GetTransform()->SetPosition(-.5, 3.5f, -1.1f);
+	entities[17]->GetTransform()->SetScale(0.45f, 0.45f, 0.45f);
+	// Create abstract piece 2
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[0], materials[2])));
+	// Move piece holder 2 into place
+	entities[18]->GetTransform()->SetPosition(.5, 3.5f, 1.1f);
+	entities[18]->GetTransform()->SetScale(0.45f, 0.45f, 0.45f);
+	// Create abstract piece 3
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[0], materials[2])));
+	// Move piece holder 3 into place
+	entities[19]->GetTransform()->SetPosition(-1.1, 3.5f, -0.5f);
+	entities[19]->GetTransform()->SetScale(0.45f, 0.45f, 0.45f);
+	// Create abstract piece 4
+	entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[0], materials[2])));
+	// Move piece holder 4 into place
+	entities[20]->GetTransform()->SetPosition(1.1, 3.5f, 0.5f);
+	entities[20]->GetTransform()->SetScale(0.45f, 0.45f, 0.45f);
+}
+
 // --------------------------------------------------------
 // Called once per program, after DirectX and the window
 // are initialized but before the game loop.
@@ -168,24 +293,16 @@ void Game::Init()
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/stipple.png").c_str(), nullptr, stippleSRV.GetAddressOf());
 
 	// Create the materials
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 16, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture5SRV, texture6SRV, texture7SRV, texture8SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(.5, 1, 1, 0), 64, pixelShaderNormals, vertexShaderNormals, texture5SRV, texture6SRV, texture7SRV, texture8SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture9SRV, texture10SRV, texture11SRV, texture12SRV, samplerState)));
-	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, .5, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture9SRV, texture10SRV, texture11SRV, texture12SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture1SRV, texture2SRV, texture3SRV, texture4SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture5SRV, texture6SRV, texture7SRV, texture8SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture9SRV, texture10SRV, texture11SRV, texture12SRV, samplerState)));
+	materials.push_back(std::shared_ptr<Material>(new Material(XMFLOAT4(1, 1, 1, 0), 256, pixelShaderNormals, vertexShaderNormals, texture13SRV, texture14SRV, texture15SRV, texture16SRV, samplerState)));
 	
 	// Create the sky
 	sky = std::shared_ptr<Sky>(new Sky(meshes[2], samplerState, device, cubeTexSRV, pixelShaderSky, vertexShaderSky));
 
 	// Create the game entities
-	for (int i = 0; i < meshes.size(); i++)
-	{
-		// Create object
-		entities.push_back(std::shared_ptr<GameEntity>(new GameEntity(meshes[i], materials[i])));
-		// Move object away from others
-		entities[i]->GetTransform()->LocalTranslate(i * 2.0f - 5.0f, 0, 0);
-	}
+	CreateObjects();
 
 	// Get size as the next multiple of 16(don’t hardcode a numberhere!)
 	unsigned int size = sizeof(VertexShaderExternalData);
@@ -206,7 +323,7 @@ void Game::Init()
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Add the camera away from the objects
-	camera = std::shared_ptr<Camera> (new Camera(XMFLOAT3(0, 0, -20), XMFLOAT3(0, 0, 0), ((float)this->width / this->height), .5f, 1, 1000, 3, 3));
+	camera = std::shared_ptr<Camera> (new Camera(XMFLOAT3(6.25f, 6, -6.75f), XMFLOAT3(.1f, -3.141592f / 4, 0), ((float)this->width / this->height), 1, 1, 1000, 3, 3));
 
 	// Set up the original directional light
 	dLight.ambientColor = XMFLOAT3(0.01f, 0.01f, 0.1f);
@@ -245,6 +362,7 @@ void Game::LoadShaders()
 	// Special pixel shaders
 	// New pixel shader that has normals and is toone
 	pixelToon = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderToonNormals.cso").c_str()));
+	pixelStipple = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderStippleNormals.cso").c_str()));
 	
 	// Post processing shaders
 	postProcessVS = std::shared_ptr<SimpleVertexShader>(new SimpleVertexShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"VertexShaderPP.cso").c_str()));
@@ -336,8 +454,36 @@ void Game::InputCheck()
 		// Enable toon shading
 		postProcessing = true;
 		stipple = true;
+		CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/stipple.png").c_str(), nullptr, stippleSRV.GetAddressOf());
 		// Set post processing shader to be hatching shading
 		pixelPostProcess = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderHatchingPostProcess.cso").c_str()));
+		for (int i = 0; i < materials.size(); i++)
+		{
+			// Set shadow type
+			materials[i]->SetPixelShader(pixelToon);
+		}
+	}
+	if (GetAsyncKeyState('5') & 0x8000)
+	{
+		// Enable toon shading
+		postProcessing = true;
+		stipple = true;
+		CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/stipple2.png").c_str(), nullptr, stippleSRV.GetAddressOf());
+		// Set post processing shader to be hatching shading
+		pixelPostProcess = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderStipplingPostProcess.cso").c_str()));
+		for (int i = 0; i < materials.size(); i++)
+		{
+			// Set shadow type
+			materials[i]->SetPixelShader(pixelToon);
+		}
+	}
+	if (GetAsyncKeyState('6') & 0x8000)
+	{
+		// Enable toon shading
+		postProcessing = true;
+		stipple = false;
+		// Set post processing shader to be hatching shading
+		pixelPostProcess = std::shared_ptr<SimplePixelShader>(new SimplePixelShader(device.Get(), context.Get(), GetFullPathTo_Wide(L"PixelShaderGreyScalePostProcess.cso").c_str()));
 		for (int i = 0; i < materials.size(); i++)
 		{
 			// Set shadow type
@@ -353,13 +499,6 @@ void Game::Update(float deltaTime, float totalTime)
 {
 	// Check for input to switch shaders
 	InputCheck();
-
-	// Update the tranformations of the entities
-	for (size_t i = 0; i < entities.size(); i++)
-	{
-		// Rotate the current entity
-		entities[i]->GetTransform()->Rotate(0, 0, deltaTime);
-	}
 
 	// Update camera
 	camera->Update(deltaTime, this->hWnd);
